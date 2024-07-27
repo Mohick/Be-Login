@@ -1,14 +1,16 @@
-
+const CreateAccount = require('../Model/CURL/Create')
 
 
 const mainController = (app) => {
 
-    app.get('/login', (req, res) => {
-        res.render('home');
+    app.post('/createUser', CreateAccount.CreateAccount)
+
+    app.get("/", (req, res) => {
+        res.render("home");
     })
 }
 
 
 
 
-module.exports = mainController;
+module.exports =  mainController;
