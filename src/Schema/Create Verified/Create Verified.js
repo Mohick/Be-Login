@@ -12,7 +12,7 @@ const CreateVerifiedAccountSchema = new Schema({
 });
 
 // Create a model using the schema
-const ModelCreateVerifiedAccountSchema = mongoose.model("VerifiedAccount", CreateVerifiedAccountSchema);
+const ModelVerifiedAccountSchema = mongoose.model("VerifiedAccount", CreateVerifiedAccountSchema);
 
 // Export the model
-module.exports = ModelCreateVerifiedAccountSchema;
+module.exports = ModelVerifiedAccountSchema;

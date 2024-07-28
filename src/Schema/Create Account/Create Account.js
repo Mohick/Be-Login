@@ -13,6 +13,6 @@ const CreateAccountSchema = new Schema({
     timestamps: true  // This adds createdAt and updatedAt fields
 });
 
-const ModelCreateAccountSchema = mongoose.model("Account", CreateAccountSchema);
+const ModelAccountSchema = mongoose.model("Account", CreateAccountSchema);
 
-module.exports = ModelCreateAccountSchema;  // Removed parentheses to export the model
+module.exports = ModelAccountSchema;  // Removed parentheses to export the model
