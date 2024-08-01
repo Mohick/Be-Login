@@ -7,11 +7,11 @@ const app = express()
 const configCORS = require('./src/Config/CORS/CORS')
 configCORS(app)
 const mainController = require("./src/MVC/Controller/Main Controll")
-const runReadJson = require('./src/Config/JSON/Json')
-const configHandleBars = require("./src/Config/Handle Bar Expess/Handle Bar Expess")
+const runReadJson = require('./src/Config/JSON/Json.js')
 const configMorgan = require('./src/Config/Morgan/Morgan')
 const connectMongoDB = require('./src/Config/Connect  MongoDB/Connect Mongoose')
 const configSessionCookies = require('./src/Config/Session Cookes/Session Cookes')
+const configHandleBars = require('./src/Config/Handle Bar Expess/Handle Bar Expess.js')
 const port = process.env.EXPRESS__PORT || 3000
 
 // config session-cookies middle

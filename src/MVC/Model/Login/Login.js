@@ -1,7 +1,7 @@
-const bcrypt = require('bcrypt');
+
 const ModelAccountSchema = require('../../../Schema/Create Account/Create Account');
 const checkFormInputFromUser = require('../Check Form Input Create Account/Check Form Input');
-
+const VerifiedAccounts = require('../Verify Account/Verify')
 class LoginAccount {
     async login(req, res) {
         const { email, password } = req.query;
@@ -18,7 +18,7 @@ class LoginAccount {
 
                 switch (true) {
                     case !account:
-                    case !(await bcrypt.compare(password, account.password)):
+                    case !(await comparePassword(password, account.password)):
                         // Nếu mật khẩu không khớp
                         return res.status(401).json({ valid: false, message: "Invalid password" });
 
@@ -32,8 +32,8 @@ class LoginAccount {
                     default:
                         // Nếu mọi thứ đều đúng
                         req.session.account = {
-                            _id: account._id,
-                            email: account.email
+                            _id: account._id.toString(),
+                            email: account.email.toString()
                         };
                         return res.json({ valid: true, message: "Login successful" });
                 }
@@ -46,45 +46,70 @@ class LoginAccount {
         }
     }
     async autoLoginEqualReadCookie(req, res) {
-        try {
+        if (req.session.account) {
             const { email, _id } = req.session.account;
-            switch (true) {
-                case !email || !_id:
-                    // Case where email or ID is missing
-                    return res.json({
-                        valid: false,
-                        message: "Missing email or ID"
-                    });
 
-                default:
-                    // Find account by email and ID
-                    const account = await ModelAccountSchema.findById({ email, _id });
+            try {
+                switch (true) {
 
-                    switch (true) {
-                        case !account:
-                            // Case where account is not found
-                            return res.json({
-                                valid: false,
-                                message: "Account not found"
-                            });
+                    case !_id || !email:
+                        return res.json({
+                            login: false,
+                            message: "Missing email or ID"
+                        });
+                    default:
+                        // Find account by email and ID
+                        const account = await ModelAccountSchema.findOne({ email, _id });
 
-                        case account.email !== email:
-                            // Case where email does not match
-                            return res.json({
-                                valid: false,
-                                message: "Email does not match"
-                            });
+                        switch (true) {
+                            case !account:
+                                // Case where account is not found
+                                return res.json({
+                                    valid: false,
+                                    message: "Account not found"
+                                });
 
-                        default:
-                            // Case where account and email are valid
-                            return res.json({
-                                valid: true,
-                                message: "Auto login successful"
-                            });
-                    }
+                            case account.email !== email:
+                                // Case where email does not match
+                                return res.json({
+                                    valid: false,
+                                    message: "Email does not match"
+                                });
+
+                            default:
+                                // Case where account and email are valid
+                                if (account.verified) {
+
+                                    return res.json({
+                                        username: account.username,
+                                        email: account.email,
+                                        password: "*************",
+                                        login: true,
+                                        verified: account.verified,
+                                        message: "Auto login successful"
+                                    });
+                                } else {
+                                    await VerifiedAccounts.createVerifyAccount(account.username, account.email)
+                                    return res.json({
+                                        username: account.username,
+                                        email: account.email,
+                                        password: "*************",
+                                        login: true,
+                                        verified: account.verified,
+                                        message: "Auto login successful"
+                                    });
+                                }
+                        }
+                }
+            } catch (error) {
+                console.error("Error finding user:", error);
+                return res.status(500).json({ valid: false, message: "Internal server error" });
             }
-        } catch (error) {
-
+        } else {
+            return res.json({
+                login: false,
+                message: "No account found in session"
+            });
         }
     }
 }

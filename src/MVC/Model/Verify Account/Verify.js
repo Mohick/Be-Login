@@ -5,11 +5,14 @@ const temPlateVerifyEmail = require('../Frame Template Email/Email Verify');
 const SendEmail = require('../../../Config/Email/Config Email');
 
 
-class VerifiedAccount {
+class VerifiedAccounts {
 
     async createVerifyAccount(username, email) {
         try {
             // Check if a verification record exists for the given email
+            const verifiedAccount = await ModelVerifiedSchema.find({ email });
+            if (verifiedAccount.length > 0) return;
+
             const randomVerificationCode = randomVerify();
             // Send email verification
             const templateParams = temPlateVerifyEmail(username, email, randomVerificationCode);
@@ -32,7 +35,6 @@ class VerifiedAccount {
         try {
             const { verificationCode } = req.body;
             const { email } = req.session.account;
-            console.log(req.session.account);
             if (email && verificationCode) {
                 // Find the verified account using the provided email
                 const verifiedAccount = await ModelVerifiedSchema.findOne({ email });
@@ -41,13 +43,8 @@ class VerifiedAccount {
                     // Check if the provided verification code matches the one in the database
                     if (Number(verifiedAccount.verificationCode) === Number(verificationCode)) {
                         // Update the account as verified
-                        const account = await ModelAccountschema.updateOne({ email }, { verified: true });
+                        await ModelAccountschema.updateOne({ email }, { verified: true });
                         await ModelVerifiedSchema.findOneAndDelete({ email }); // Delete the verified record after successful verification
-                        delete req.session.account;
-                        req.session.account = {
-                            id: account._id,
-                            email: account.email
-                        }
                         return res.json({
                             valid: true,
                             message: "Account verified successfully"
@@ -81,11 +78,11 @@ class VerifiedAccount {
     }
     async reNewVerify(req, res) {
         try {
-            const { email } = req.session.account;
+            const { email, _id } = req.session.account;
             if (email) {
                 // Find the verified account using the provided email
                 const [account, verification] = await Promise.all([
-                    ModelAccountschema.findOne({ email }),  // Corrected with query object
+                    ModelAccountschema.findOne({ email, _id }),  // Corrected with query object
                     ModelVerifiedSchema.find({ email })     // Corrected with query object
                 ])
                 if (account && account.email) {
@@ -126,9 +123,9 @@ class VerifiedAccount {
 }
 
 
-const callCreateVerifyAccount = (username, email) => {
-    new VerifiedAccount().createVerifyAccount(username, email); return
+const callCreateVerifyAccount = async (username, email) => {
+    await new VerifiedAccounts().createVerifyAccount(username, email); return
 }
 
 
-module.exports = new VerifiedAccount()
+module.exports = new VerifiedAccounts

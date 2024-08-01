@@ -1,11 +1,7 @@
 
 
 
-
-
-
-
-const ContainerRegex = {
+const containerRegex = {
     username: (strUsername) => {
         // Min length is 6, max length is 30
         const regex = /^[a-zA-Z0-9._]{6,30}$/;
@@ -23,5 +19,4 @@ const ContainerRegex = {
     }
 };
 
-
-module.exports = ContainerRegex
+module.exports = containerRegex;

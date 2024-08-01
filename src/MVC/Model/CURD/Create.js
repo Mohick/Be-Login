@@ -1,9 +1,6 @@
 const ModelAccountSchema = require('../../../Schema/Create Account/Create Account');
-
-const bcrypt = require('bcrypt');
-const VerifiedAccount = require('../Verify Account/Verify');
 const checkFormInputFromUser = require('../Check Form Input Create Account/Check Form Input');
-
+const bcrypt = require('bcrypt');
 class CreateAccount {
     async CreateAccount(req, res) {
         const { username, password, email } = req.body;
@@ -20,22 +17,27 @@ class CreateAccount {
                     return res.json({ valid: false, message: "Email already exists." });
                 } else {
                     // Hash the password using bcrypt
-                    const salt = await bcrypt.genSalt(Number(process.env.EXPRESS__ROUNDS__HASH));
-                    const hash = await bcrypt.hash(password, salt);
                     // Create new account
-                    const newAccount = new ModelAccountSchema({
-                        username: username,
-                        password: hash,
-                        email: email
-                    });
-                    await newAccount.save();
+                    await bcrypt.genSalt(Number(process.env.EXPRESS__ROUNDS__HASH), (err, salt) => {
+                        return bcrypt.hash(password, salt, function (err, hash) {
+                            const newAccount = new ModelAccountSchema({
+                                username: username,
+                                password: hash,
+                                email: email
+                            });
 
-                    // Send email verification
-                    req.session.account = {
-                        email: email
-                    }
-                    await VerifiedAccount.createVerifyAccount(username, email);
-                    return res.json({ email });
+                            req.session.account = {
+                                email: email,
+                                _id: newAccount._id.toString()
+                            }
+                            newAccount.save();
+                            return res.json({
+                                valid: true,
+                                message: "Account created successfully. Please verify your email address."
+                            });
+
+                        });
+                    });
                 }
             } catch (error) {
                 console.error("Error finding user:", error);

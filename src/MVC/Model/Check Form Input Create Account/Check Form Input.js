@@ -1,14 +1,14 @@
-const ContainerRegex = require("../../../Regex/Manager Regex");
+const containerRegex = require("../../../Regex/Manager Regex");
 
 
 const checkFormInputFromUser = {
     username: (username) => {
-        return ContainerRegex.username(username) ?
+        return containerRegex.username(username) ?
             { valid: true, message: "" } :
             { valid: false, message: "Username must be at least 6 characters and no more than 30 characters long." };
     },
     password: (password) => {
-        return ContainerRegex.password(password) ?
+        return containerRegex.password(password) ?
             {
                 valid: true,
                 message: {
@@ -31,7 +31,7 @@ const checkFormInputFromUser = {
             };
     },
     email: (email) => {
-        return ContainerRegex.email(email) ?
+        return containerRegex.email(email) ?
             { valid: true, message: "" } :
             { valid: false, message: "Invalid email address. Please enter a valid email." };
     }
