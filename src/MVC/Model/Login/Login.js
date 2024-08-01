@@ -2,9 +2,10 @@
 const ModelAccountSchema = require('../../../Schema/Create Account/Create Account');
 const checkFormInputFromUser = require('../Check Form Input Create Account/Check Form Input');
 const VerifiedAccounts = require('../Verify Account/Verify')
+const bcrypt = require('bcrypt');
 class LoginAccount {
     async login(req, res) {
-        const { email, password } = req.query;
+        const { email, password } = req.body;
 
         // Validation checks
         const checked = {
@@ -14,26 +15,18 @@ class LoginAccount {
 
         if (checked.email.valid && checked.password.valid) {
             try {
-                const account = await ModelAccountSchema.findOne({ email });
+                const account = await ModelAccountSchema.findOne({ email: email });
 
                 switch (true) {
                     case !account:
-                    case !(await comparePassword(password, account.password)):
+                    case !(await bcrypt.compare(password, account.password)):
                         // Nếu mật khẩu không khớp
-                        return res.status(401).json({ valid: false, message: "Invalid password" });
-
-                    case !account.verified:
-                        // Nếu tài khoản chưa được xác minh
-                        req.session.account = {
-                            email: account.email
-                        };
-                        return res.status(403).json({ valid: false, message: "Account is not verified" });
-
+                        return res.status(200).json({ valid: false, message: "Invalid password" });
                     default:
                         // Nếu mọi thứ đều đúng
                         req.session.account = {
-                            _id: account._id.toString(),
-                            email: account.email.toString()
+                            email: account.email,
+                            _id: account._id.toString()
                         };
                         return res.json({ valid: true, message: "Login successful" });
                 }

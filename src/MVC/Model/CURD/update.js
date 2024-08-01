@@ -2,6 +2,7 @@
 const bcrypt = require('bcrypt');
 const checkFormInputFromUser = require("../Check Form Input Create Account/Check Form Input");
 const ModelAccountSchema = require("../../../Schema/Create Account/Create Account");
+const Verify = require('../Verify Account/Verify');
 
 class UpdateAccount {
 
@@ -9,6 +10,7 @@ class UpdateAccount {
         if (req.session.account) {
             const { email, _id } = req.session.account;
             const { newUsername, newEmail, newPassword, currentPassword } = req.body;
+
             if (!currentPassword) return res.json({
                 valid: false,
                 message: "Current password is incorrect."
@@ -40,18 +42,24 @@ class UpdateAccount {
                                         message: "Email already exists."
                                     });
                                 } else {
-                                    if (!checkFormInputFromUser.password(newPassword) && newPassword.trim().length < 1) {
+                                    if (!checkFormInputFromUser.password(newPassword).valid) {
                                         let newAccount = {
                                             username: newUsername,
+                                            verified: false,
                                             email: newEmail,
                                         }
                                         await ModelAccountSchema.findByIdAndUpdate(_id, newAccount, { new: true });
+                                        req.session.account = {
+                                            email: newEmail,
+                                            _id: oldInfoAccount._id.toString(),
+                                        };
                                     } else {
                                         await bcrypt.genSalt(Number(process.env.EXPRESS__ROUNDS__HASH), function (err, salt) {
                                             bcrypt.hash(newPassword, salt, async function (err, hash) {
                                                 let newAccount = {
                                                     username: newUsername,
                                                     email: newEmail,
+                                                    verified: false,
                                                     password: hash
                                                 }
                                                 await ModelAccountSchema.findByIdAndUpdate(_id, newAccount, { new: true });
@@ -87,19 +95,21 @@ class UpdateAccount {
                             const match = await bcrypt.compare(currentPassword, account.password)
                             if (match) {
 
-                                if (!checkFormInputFromUser.password(newPassword) && newPassword.trim().length < 1) {
-                                    console.log(3);
+                                if (!checkFormInputFromUser.password(newPassword).valid) {
                                     const newAccount = {
                                         username: newUsername,
                                     }
+
                                     await ModelAccountSchema.findByIdAndUpdate(_id, newAccount, { new: true });
                                 } else {
                                     await bcrypt.genSalt(Number(process.env.EXPRESS__ROUNDS__HASH), function (err, salt) {
                                         return bcrypt.hash(newPassword, salt, async function (err, hash) {
+
                                             const newAccount = {
                                                 username: newUsername,
                                                 password: hash
                                             }
+
                                             await ModelAccountSchema.findByIdAndUpdate(_id, newAccount, { new: true });
                                         });
                                     });
