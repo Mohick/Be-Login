@@ -2,7 +2,7 @@ const cors = require('cors');
 
 const configCORS = (app) => {
     const corsOptions = {
-        origin: process.env.EXPRESS__URL__CLIENT, // Replace with your allowed origin
+        origin: "https://sparkling-bubblegum-1f096b.netlify.app", // Replace with your allowed origin
         methods: ['GET', 'POST', 'PUT', 'patch', 'DELETE', 'OPTIONS'], // Methods you want to allow
         allowedHeaders: ['Content-Type', 'Authorization'], // Headers you want to allow
         credentials: true // Allow cookies to be sent
