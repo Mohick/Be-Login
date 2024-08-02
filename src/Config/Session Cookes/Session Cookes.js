@@ -9,7 +9,7 @@ const configSessionCookies = (app) => {
         maxAge: 1000 * 60 * 60 * 24 * 7, // 7 ngày
         secure: true, // Chỉ gửi cookie qua HTTPS trong môi trường sản xuất
         httpOnly: true,
-        sameSite: 'Strict' // Hoặc 'Strict' tùy thuộc vào yêu cầu bảo mật của bạn
+        sameSite: 'lax' // Hoặc 'Strict' tùy thuộc vào yêu cầu bảo mật của bạn
     }))
 }
 
