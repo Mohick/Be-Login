@@ -6,6 +6,7 @@ const app = express()
 // config cors middleware
 const configCORS = require('./src/Config/CORS/CORS')
 configCORS(app)
+var cookieParser = require('cookie-parser')
 const mainController = require("./src/MVC/Controller/Main Controll")
 const runReadJson = require('./src/Config/JSON/Json.js')
 const configMorgan = require('./src/Config/Morgan/Morgan')
@@ -13,7 +14,7 @@ const connectMongoDB = require('./src/Config/Connect  MongoDB/Connect Mongoose')
 const configSessionCookies = require('./src/Config/Session Cookes/Session Cookes')
 const configHandleBars = require('./src/Config/Handle Bar Expess/Handle Bar Expess.js')
 const port = process.env.EXPRESS__PORT || 3000
-
+app.use(cookieParser())
 // config session-cookies middle
 configSessionCookies(app)
 //config morgan 

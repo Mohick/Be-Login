@@ -71,6 +71,8 @@ class LoginAccount {
 
                             default:
                                 // Case where account and email are valid
+                                console.log(req.cookies);
+                                
                                 if (account.verified) {
 
                                     return res.json({
