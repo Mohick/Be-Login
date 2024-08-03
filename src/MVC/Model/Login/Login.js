@@ -39,6 +39,7 @@ class LoginAccount {
         }
     }
     async autoLoginEqualReadCookie(req, res) {
+        res.cookie('myCookie', 'hello')
         if (req.session.account) {
             const { email, _id } = req.session.account;
 
