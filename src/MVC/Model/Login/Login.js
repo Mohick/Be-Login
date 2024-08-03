@@ -30,7 +30,7 @@ class LoginAccount {
                         };
                         return res.json({ valid: true, message: "Login successful" });
                 }
-                
+
             } catch (error) {
                 console.error("Error finding user:", error);
                 return res.status(500).json({ valid: false, message: "Internal server error" });
@@ -40,7 +40,7 @@ class LoginAccount {
         }
     }
     async autoLoginEqualReadCookie(req, res) {
-        res.cookie('myCookie', 'hello', { sameSite: 'lax' })
+        res.cookie('myCookie', 'hello', { sameSite: 'None' })
         if (req.session.account) {
             const { email, _id } = req.session.account;
 
