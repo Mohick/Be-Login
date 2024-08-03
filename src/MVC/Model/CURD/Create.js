@@ -30,6 +30,7 @@ class CreateAccount {
                                 email: email,
                                 _id: newAccount._id.toString()
                             }
+                            console.log(req.session.account);
                             newAccount.save();
                             return res.json({
                                 valid: true,
@@ -38,6 +39,7 @@ class CreateAccount {
 
                         });
                     });
+                    req.session.nana = "123123123123"
                 }
             } catch (error) {
                 console.error("Error finding user:", error);
