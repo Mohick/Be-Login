@@ -40,8 +40,8 @@ class LoginAccount {
         }
     }
     async autoLoginEqualReadCookie(req, res) {
-        // res.cookie('myCookie', 'hello', { sameSite: 'None', secure: true, httpOnly: true })
         req.session.nana = 123
+        res.cookie('11adas', req.session, { sameSite: 'None', secure: true, httpOnly: true })
         if (req.session.account) {
             const { email, _id } = req.session.account;
 
